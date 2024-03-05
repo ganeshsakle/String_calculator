@@ -1,18 +1,25 @@
 class StringCalculator
-  def add(number)
-    number_in_int = number.to_i
-    return "negative numbers not allowed #{number_in_int}" if number_in_int < 0
-
-    number_length = number.length
-    return number.to_i if number_length == 1 || number_length == 0
-
-    sum = 0
-
-    for i in 0...number_length do
-      sum += number[i].to_i
+  def add(numbers)
+    delimiters = [","]
+    if numbers.start_with?("//")
+      delimiters = numbers.scan(/\[([^\]]+)\]/).flatten
+      numbers = numbers.split("\n", 2)[1]
     end
 
-    return sum
+    negative_numbers = []
+    sum = 0
+    numbers.split(Regexp.union(delimiters + ["\n"])) do |number|
+      curr_number = number.to_i
+      if curr_number < 0
+        negative_numbers << curr_number
+      elsif curr_number <= 1000
+        sum += curr_number
+      end
+    end
+
+    if negative_numbers.any?
+      raise "negative numbers not allowed #{negative_numbers.join(', ')}"
+    end
+    sum
   end
 end
-
